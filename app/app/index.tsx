@@ -1,11 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, Modal, Pressable } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
 import { Redirect } from "expo-router";
 import { enableScreens } from "react-native-screens";
-//import { Polyline } from "react-native-maps";
-import Polyline from '@mapbox/polyline';
+import { Polyline } from "react-native-maps";
 import MarkerPin from "../components/Map/marker";
 import useGeoLocation from "../components/Map/useGeo";
 import MapView from "react-native-maps";
@@ -101,7 +99,7 @@ useEffect(() => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <CarList callback = {setIsPopupVisible}/>
+            <CarList callback = {setIsPopupVisible} location = {location}/>
           </View>
         </View>
       </Modal>
