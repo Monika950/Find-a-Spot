@@ -1,12 +1,9 @@
 interface parkingSegment {
     segmentId: number;
-    start: {
-        longitude: number;
-        latitude: number;
-    }
-    end: {
-        longitude: number;
-        latitude: number;
-    }
+    start: geoPoint
+    end: geoPoint
     maxParkingCapacity: number;
+    freeParkingCapacity: number;
 }
+
+type geoPoint = [number, number];
