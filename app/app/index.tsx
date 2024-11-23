@@ -7,19 +7,19 @@ import { enableScreens } from 'react-native-screens';
 enableScreens();
 
 export default function AuthIndexPage() {
-  const { user } = useAuth();
+    const {user} = useAuth();
 
-  if (!user) {
-    return <Redirect href="/auth" />;
-  }
+    if (!user) {
+        return <Redirect href="/auth" />;
+    }
 
-  return (
-      <ThemedView viewColor="background">
-        <ThemedText>
-          actuals index
-        </ThemedText>
-      </ThemedView>
-  )
+    return (
+        <ThemedView viewColor="background">
+            <ThemedText>
+                actuals index
+            </ThemedText>
+        </ThemedView>
+    )
 }
 
 const styles = StyleSheet.create({
