@@ -1,0 +1,20 @@
+{
+    "expo": {
+      "name": "findspot",
+      "slug": "findspot-slug",
+      "platforms": ["ios", "android"],
+      "version": "1.0.0",
+      "sdkVersion": "52.0.0",
+      "assetBundlePatterns": ["**/*"],
+      "ios": {
+        "bundleIdentifier": "com.yourappname"
+      },
+      "android": {
+        "package": "com.yourappname",
+        "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+      },
+      "description": "Your App Description",
+      "entryPoint": "./node_modules/expo/AppEntry.js"
+    }
+  }
+  

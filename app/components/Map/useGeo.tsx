@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import Geolocation from "react-native-geolocation-service";
+import Geolocation, { PositionError, GeoPosition } from "react-native-geolocation-service";
+import { Platform, PermissionsAndroid } from "react-native";
 
 interface LocationState {
   loaded: boolean;
@@ -16,7 +17,25 @@ const useGeoLocation = () => {
     coordinates: null,
   });
 
-  const onSuccess = (position: GeolocationPosition) => {
+  const requestPermission = async () => {
+    try {
+      if (Platform.OS === "ios") {
+        const status = await Geolocation.requestAuthorization("whenInUse");
+        return status === "granted";
+      } else if (Platform.OS === "android") {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      }
+      return false;
+    } catch (error) {
+      console.error("Permission error:", error);
+      return false;
+    }
+  };
+
+  const onSuccess = (position: GeoPosition) => {
     setLocation({
       loaded: true,
       coordinates: {
@@ -26,20 +45,22 @@ const useGeoLocation = () => {
     });
   };
 
-  const onError = (error: GeolocationPositionError) => {
+  const onError = (error: PositionError) => {
     setLocation({
       loaded: true,
       coordinates: null,
       error: {
-        code: error.code,
+        code: error.code === 1 ? 1 : 2,  // 1 is PERMISSION_DENIED
         message: error.message,
       },
     });
   };
 
   useEffect(() => {
-    Geolocation.requestAuthorization("whenInUse").then((status) => {
-      if (status === "granted") {
+    const fetchLocation = async () => {
+      const hasPermission = await requestPermission();
+
+      if (hasPermission) {
         Geolocation.getCurrentPosition(
           onSuccess,
           onError,
@@ -50,12 +71,17 @@ const useGeoLocation = () => {
           }
         );
       } else {
-        onError({
-          code: 1, // Custom error code
+        // Create a PositionError object when permission is denied
+        const error: PositionError = {
+          code: 1, // Denied error code
           message: "Location permission denied",
-        } as GeolocationPositionError);
+          PERMISSION_DENIED: true, // Explicitly add the permission denied property
+        };
+        onError(error);
       }
-    });
+    };
+
+    fetchLocation();
   }, []);
 
   return location;
