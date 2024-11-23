@@ -2,7 +2,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import authRouter from './routes/auth';
 import carRuter from './routes/cars';
-
+import parkingSegmentRouter from './routes/segments';
+ 
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use(cors());
 app.use('/auth', authRouter);
 app.use('/cars', carRuter);
+app.use('/segments', parkingSegmentRouter);
 
 // Routes
 app.get('/', (req: Request, res: Response) => {

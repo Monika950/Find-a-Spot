@@ -21,7 +21,6 @@ router.get("/", useAuthenticate, async (req: Request, res: Response) => {
 
 router.put("/", useAuthenticate, async (req: Request, res: Response) => {
     try {
-        console.log(req.body);
         const { description, numberPlate} = req.body;
         const userCars = await getUsersCars(req.user);
         const carExists = userCars.find((car) => car.numberPlate === numberPlate);
