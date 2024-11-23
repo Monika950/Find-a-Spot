@@ -21,6 +21,7 @@ router.get("/", useAuthenticate, async (req: Request, res: Response) => {
 
 router.put("/", useAuthenticate, async (req: Request, res: Response) => {
     try {
+        console.log(req.body);
         const { description, numberPlate} = req.body;
         const userCars = await getUsersCars(req.user);
         const carExists = userCars.find((car) => car.numberPlate === numberPlate);
@@ -39,8 +40,8 @@ router.put("/", useAuthenticate, async (req: Request, res: Response) => {
             numberPlate,
             parkedAt: null,
         };
-        await addCar(car);
-        res.status(201).json({ message: "Car added successfully." });
+        const carid = await addCar(car);
+        res.status(201).json({ message: "Car added successfully.", _id: carid });
     } catch (error) {
         console.error("Error in /cars route:", error);
         res.status(500).json({

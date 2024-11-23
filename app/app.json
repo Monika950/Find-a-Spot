@@ -11,7 +11,7 @@
       },
       "android": {
         "package": "com.yourappname",
-        "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+        "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION", "SEND_SMS"]
       },
       "description": "Your App Description",
       "entryPoint": "./node_modules/expo/AppEntry.js"

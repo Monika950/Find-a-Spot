@@ -19,6 +19,7 @@ export const addCar = async (car: Car) => {
     await client.connect();
     const db = client.db("FindASpot");
     const collection = db.collection("cars");
-    await collection.insertOne(car);
+    const result = await collection.insertOne(car);
     await client.close();
+    return result.insertedId.toString();
 };

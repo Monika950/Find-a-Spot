@@ -1,3 +1,4 @@
 
-app/package-lock.json
+package-lock.json
 app/.env
+app/package-lock.json

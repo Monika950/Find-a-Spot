@@ -7,6 +7,7 @@ import { Text, View, StyleSheet } from "react-native";
 import MapView from "react-native-maps";
 import MarkerPin from "../components/Map/marker";
 import useGeoLocation from "../components/Map/useGeo";
+import SendSMS from "../components/SendSmsButton";
 
 enableScreens();
 
@@ -56,6 +57,8 @@ export default function Index() {
         
         <MarkerPin positionMarker={location} />
       </MapView>
+      <SendSMS />
+      
     </View>
   );
 }
