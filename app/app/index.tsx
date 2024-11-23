@@ -56,14 +56,12 @@ useEffect(() => {
   const lineCoordinates = [
     defaultCenter, 
     {latitude: 42.6739551, longitude: 23.3305122},
-    { latitude: 37.79025, longitude: -122.4364 }, 
   ];
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Map Page</Text>
 
-      {/* Map Component */}
       <MapView
         style={styles.map}
         initialRegion={{
@@ -77,11 +75,7 @@ useEffect(() => {
         <MarkerPin positionMarker={location} scale={scale}/>
         <MarkerPin positionMarker={defaultCenter} scale={scale}/>
         <MarkerPin positionMarker={{ latitude: 37.79025, longitude: -122.4364 }} scale={scale}/>
-          <Polyline
-            coordinates={lineCoordinates}
-            strokeColor="#FF0000" 
-            strokeWidth={7} 
-          />
+        <Polyline coordinates={lineCoordinates} strokeWidth={2} strokeColor="red" />
 
       </MapView>
 
