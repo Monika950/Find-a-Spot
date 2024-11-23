@@ -2,14 +2,14 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // Define the types for User and AuthContext
 interface User {
-    id: string;
-    name: string;
     email: string;
+    token: string;
 }
 
 interface AuthContextType {
     user: User | null;
     login: (user: User) => void;
+    register: (user: User) => void;
     logout: () => void;
 }
 
@@ -30,6 +30,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // Additional login logic, e.g., setting tokens, can go here
     };
 
+    const register = (user: User) => {
+        setUser(user);
+        // Additional login logic, e.g., setting tokens, can go here
+    };
+
     // Logout function
     const logout = () => {
         setUser(null);
@@ -37,7 +42,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
 
     // Context value
-    const value: AuthContextType = { user, login, logout };
+    const value: AuthContextType = { user, login, register, logout };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

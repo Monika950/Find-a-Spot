@@ -22,11 +22,12 @@ export function ThemedInput({
     placeHolder,
     InputContainerStyle,
     secret,
+    onChangeText,
 }: ThemedInputProps) {
     const textColor = useThemeColor("text");
     const secondaryTextColor = useThemeColor("secondaryText");
 
-    const [isSecret, setIsSecret] = useState(true);
+    const [isSecret, setIsSecret] = useState(secret);
         
 
     return (
@@ -35,7 +36,7 @@ export function ThemedInput({
             <TextInput style={[
                 { color: textColor, flex: 1 },
                 style,
-            ]} placeholder={placeHolder} placeholderTextColor={secondaryTextColor} secureTextEntry={isSecret} />
+            ]} placeholder={placeHolder} placeholderTextColor={secondaryTextColor} secureTextEntry={isSecret} onChangeText={onChangeText} />
             <TouchableOpacity onPress={() => setIsSecret(!isSecret)}>
                 {secret && 
                     <MaterialCommunityIcons name={isSecret ? "eye" : "eye-off"} size={24} color={textColor} />

@@ -23,6 +23,15 @@ export default function RootLayout() {
                             navigationBarHidden: true,
                         }}
                     />
+                    <Stack.Screen
+                        name="map1"
+                        options={{
+                            headerShown: false,
+                            statusBarTranslucent: true,
+                            navigationBarHidden: true,
+                        }}
+                    />
+                    
                 </Stack>
             </GestureHandlerRootView>
         </AuthProvider>
