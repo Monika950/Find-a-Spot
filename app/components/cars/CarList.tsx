@@ -9,14 +9,18 @@ import {
   Pressable,
 } from "react-native";
 import CarForm from "./CarForm";
+import SendSMS from "../../hooks/SendSms";
 import { useAuth } from "../../contexts/AuthContext";
+import { ZoneNumbers } from "../../constants/ZoneNumbers";
+import { Alert } from "react-native";
 
-export default function CarList({ callback }) {
+export default function CarList({ callback, location }) {
   const { user } = useAuth();
   const [cars, setCars] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null); // Track the selected car
   const [isModalVisible, setIsModalVisible] = useState(false); // Track modal visibility
+  const [zoneType, setZoneType] = useState('');
 
   useEffect(() => {
     async function getCarsData() {
@@ -69,11 +73,33 @@ export default function CarList({ callback }) {
 
   const selectCar = (car) => {
     setSelectedCar(car); // Set the selected car
+    setZoneType('Green');
     setIsModalVisible(true); // Show the modal
   };
 
-  const handleConfirm = () => {
-    console.log("Car confirmed:", selectedCar);
+  const handleConfirm = (plateNumber) => {
+
+    const zoneNumber = (zoneType == 'Green' ? ZoneNumbers.greenZoneNumber : ZoneNumbers.blueZoneNumber);
+    SendSMS(plateNumber, zoneNumber, async () => {
+      try {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_SERVERURL}/cars/park`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            plateNumber,
+            location
+          }),
+        });
+
+        const data = await response.json();
+
+      } catch (error) {
+        Alert.alert("Error", "An error occured when trying to send SMS.");
+      }
+    })
+    
     setIsModalVisible(false); // Close the modal
   };
 
@@ -125,10 +151,10 @@ export default function CarList({ callback }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.popupText}>
-              Are you sure you want to select: {selectedCar?.name} ({selectedCar?.number})?
+              Are you sure you want to send a SMS for {zoneType} zone: {selectedCar?.name} ({selectedCar?.number})?
             </Text>
             <View style={styles.modalButtons}>
-              <Pressable style={styles.modalButtonConfirm} onPress={handleConfirm}>
+              <Pressable style={styles.modalButtonConfirm} onPress={() => { handleConfirm(selectedCar.number) }}>
                 <Text style={styles.modalButtonText}>Confirm</Text>
               </Pressable>
               <Pressable style={styles.modalButtonClose} onPress={handleClose}>

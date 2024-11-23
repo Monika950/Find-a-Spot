@@ -154,7 +154,7 @@ export default function Index() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <CarList callback={setIsPopupVisible} />
+            <CarList callback = {setIsPopupVisible} location = {location}/>
           </View>
         </View>
       </Modal>
