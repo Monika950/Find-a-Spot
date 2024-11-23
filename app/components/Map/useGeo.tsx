@@ -22,7 +22,7 @@ export default function App() {
       const locationSubscription = await Location.watchPositionAsync(
         {
           accuracy: Location.Accuracy.High,
-          timeInterval: 1000,
+          timeInterval: 15000,
           distanceInterval: 15, 
         },
         (newLocation) => {
