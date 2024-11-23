@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import MapView, { Marker } from 'react-native-maps';
+import MapView from 'react-native-maps';
 import { View, Text, StyleSheet } from 'react-native';
 
 interface MapProps {
@@ -16,7 +16,7 @@ const Map: React.FC<MapProps> = ({ children, center, onMapLoad, onPress }) => {
   const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    // Simulate map load success as react-native-maps doesn't provide a direct "onLoad" prop
+    
     setIsMapLoaded(true);
     if (onMapLoad) {
       onMapLoad(true);
@@ -31,8 +31,8 @@ const Map: React.FC<MapProps> = ({ children, center, onMapLoad, onPress }) => {
           initialRegion={{
             latitude: center.latitude,
             longitude: center.longitude,
-            latitudeDelta: 0.005, // Adjust zoom level
-            longitudeDelta: 0.005, // Adjust zoom level
+            latitudeDelta: 0.01, 
+            longitudeDelta: 0.01, 
           }}
           onPress={onPress}
           onMapReady={() => {
@@ -40,14 +40,13 @@ const Map: React.FC<MapProps> = ({ children, center, onMapLoad, onPress }) => {
           }}
         >
           {children}
-          {/* Example Marker */}
-          <Marker
+          {/* <Marker
             coordinate={{
               latitude: center.latitude,
               longitude: center.longitude,
             }}
             title="Center Location"
-          />
+          /> */}
         </MapView>
       ) : (
         <Text style={styles.loadingText}>Loading map...</Text>

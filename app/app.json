@@ -1,6 +1,7 @@
 {
     "expo": {
       "name": "findspot",
+      "scheme": "find-a-spot-scheme",
       "slug": "findspot-slug",
       "platforms": ["ios", "android"],
       "version": "1.0.0",
@@ -8,8 +9,14 @@
       "assetBundlePatterns": ["**/*"],
       "ios": {
         "bundleIdentifier": "com.yourappname"
+
       },
       "android": {
+        "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDhlmzHqCKdzpKk2nCgsB6mzhKB1WL7dPY"
+        }
+    },
         "package": "com.yourappname",
         "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION", "SEND_SMS"]
       },
