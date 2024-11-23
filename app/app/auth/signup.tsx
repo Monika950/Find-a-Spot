@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
 
@@ -11,13 +11,18 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function SignupPage() {
-    const { register } = useAuth();
+    const { user, register } = useAuth();
     const [email, setEmail] = useState(""); // Email state
     const [password, setPassword] = useState(""); // Password state
     const [rePassword, setRePassword] = useState(""); // Confirm password state
     const [phone, setPhone] = useState(""); // Phone number state
 
     const router = useRouter();
+
+    useEffect(()=>{if(user)
+        {
+            router.push('/');
+        }},[user]);
 
     // Function to handle signup
     const handleSignup = async () => {
@@ -61,6 +66,9 @@ export default function SignupPage() {
         }
     };
 
+    const goToLogin = () => {
+        router.push("auth/login"); // Redirect to the signup page
+    };
     
 
     return (
@@ -102,6 +110,13 @@ export default function SignupPage() {
                         iconSize={18}
                         containerStyles={styles.signupButton}
                         onPress={handleSignup}
+                    />
+                    <ThemedButton
+                        text="Go to Login"
+                        icon="login"
+                        iconSize={18}
+                        containerStyles={styles.signinButton}
+                        onPress={goToLogin}
                     />
                 </ThemedView>
             </ThemedView>
@@ -145,6 +160,14 @@ const styles = StyleSheet.create({
         flexDirection: "column",
     },
     signupButton: {
+        marginTop: 20,
+        padding: 10,
+        width: 250,
+        alignItems: "center",
+        borderRadius: 15,
+        justifyContent: "space-between",
+    },
+    signinButton: {
         marginTop: 20,
         padding: 10,
         width: 250,

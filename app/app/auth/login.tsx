@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Alert } from "react-native";
 import { useRouter } from 'expo-router';
 
@@ -13,11 +13,15 @@ import { AuthProvider, useAuth } from "../../contexts/AuthContext";
 import { Redirect } from "expo-router";
 
 export default function LoginPage() {
-    const { login } = useAuth();
+    const { user,login } = useAuth();
     const [email, setEmail] = useState(""); // Email state
     const [password, setPassword] = useState(""); // Password state
 
     const router = useRouter();
+    useEffect(()=>{if(user)
+        {
+            router.push('/');
+        }},[user]);
 
     // Function to handle login
     const handleLogin = async () => {
