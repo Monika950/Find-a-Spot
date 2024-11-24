@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, Modal, Pressable,Image, Alert } from "react-native";
+import { Text, View, StyleSheet, Modal, Pressable, Alert } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
 import { Redirect } from "expo-router";
 import { enableScreens } from "react-native-screens";
@@ -60,7 +60,6 @@ export default function Index() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log(`${process.env.EXPO_PUBLIC_SERVERURL}/segments/`);
         const response = await fetch(
           `${process.env.EXPO_PUBLIC_SERVERURL}/segments/`,
           {
@@ -90,11 +89,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.title}>Find a Spot</Text> */}
-      <Image
-  source={require("../assets/logo.png")}
-  style={styles.logo}
-/>
+      <Text style={styles.title}>Map Page</Text>
 
       <MapView
         style={styles.map}
@@ -109,15 +104,23 @@ export default function Index() {
         <MarkerPin positionMarker={location} scale={scale} />
 
         {segments.map((segment) => {
-          const coordinates= [...segment.switched_coordinates];
-          
+          const coordinates = [
+            {
+              longitude: segment.start[1],
+              latitude: segment.start[0],
+            },
+            {
+              longitude: segment.end[1],
+              latitude: segment.end[0],
+            },
+          ];
 
-          //console.log(segment.switched_coordinates);
-          const freeRatio =(segment.freeParkingCapacity / segment.max_capacity) * 100;
+          const freeRatio =
+            (segment.freeParkingCapacity / segment.maxParkingCapacity) * 100;
 
+          // Determine color based on the free ratio
           let color = "red"; // Default to red (overcrowded)
-        //   console.log(segment.freeParkingCapacity, segment.max_capacity)
-        //   console.log(freeRatio)
+          console.log(segment.freeParkingCapacity, segment.maxParkingCapacity)
           if (freeRatio > 75) {
             color = "green"; // More than 75% free: green
           } else if (freeRatio > 25) {
@@ -151,7 +154,7 @@ export default function Index() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <CarList callback = {setIsPopupVisible} location = {location}/>
+            <CarList callback={setIsPopupVisible} />
           </View>
         </View>
       </Modal>
@@ -160,55 +163,59 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      margin:0
-    },
-    map: {
-      width: "100%",
-      height: "100%",
-    },
-    logo: {
-      width: 60,
-      height: 90, 
-      position: "absolute",
-      top: 40, 
-      left: 20,
-      zIndex: 10,
-      elevation: 5,
-    },
-    popupButton: {
-      position: "absolute",
-      bottom: 20,
-      right: 20,
-      backgroundColor: "#007bff",
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      justifyContent: "center",
-      alignItems: "center",
-      elevation: 5,
-    },
-    popupButtonText: {
-      color: "white",
-      fontWeight: "bold",
-      fontSize: 24,
-    },
-    modalOverlay: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "rgba(0,0,0,0.5)",
-    },
-    modalContent: {
-      width: "90%",
-      backgroundColor: "white",
-      padding: 20,
-      borderRadius: 10,
-      alignItems: "center",
-      height: 500,
-    },
-  });
-  
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginVertical: 10,
+  },
+  map: {
+    width: "100%",
+    height: "90%",
+  },
+  popupButton: {
+    position: "absolute",
+    bottom: 20, // Positioned above the bottom edge
+    right: 20, // Positioned on the right side of the screen
+    backgroundColor: "#007bff",
+    width: 60, // Circular button
+    height: 60, // Circular button
+    borderRadius: 30, // Make it a perfect circle
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5, // Add shadow for better visibility
+  },
+  popupButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 24, // Large "P"
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    width: "90%",
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    height: 500,
+  },
+  closeButton: {
+    marginTop: 15,
+    padding: 10,
+    backgroundColor: "#6200ee",
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+});
