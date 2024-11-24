@@ -84,7 +84,6 @@ export default function Index() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log(`${process.env.EXPO_PUBLIC_SERVERURL}/segments/`);
         const response = await fetch(
           `${process.env.EXPO_PUBLIC_SERVERURL}/segments/`,
           {
@@ -123,11 +122,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.title}>Find a Spot</Text> */}
-      <Image
-  source={require("../assets/logo.png")}
-  style={styles.logo}
-/>
+      <Text style={styles.title}>Map Page</Text>
 
       <MapView
         style={styles.map}
@@ -142,15 +137,23 @@ export default function Index() {
         <MarkerPin positionMarker={location} scale={scale} />
 
         {segments.map((segment) => {
-          const coordinates= [...segment.switched_coordinates];
-          
+          const coordinates = [
+            {
+              longitude: segment.start[1],
+              latitude: segment.start[0],
+            },
+            {
+              longitude: segment.end[1],
+              latitude: segment.end[0],
+            },
+          ];
 
-          //console.log(segment.switched_coordinates);
-          const freeRatio =(segment.freeParkingCapacity / segment.max_capacity) * 100;
+          const freeRatio =
+            (segment.freeParkingCapacity / segment.maxParkingCapacity) * 100;
 
+          // Determine color based on the free ratio
           let color = "red"; // Default to red (overcrowded)
-        //   console.log(segment.freeParkingCapacity, segment.max_capacity)
-        //   console.log(freeRatio)
+          console.log(segment.freeParkingCapacity, segment.maxParkingCapacity)
           if (freeRatio > 75) {
             color = "green"; // More than 75% free: green
           } else if (freeRatio > 25) {
