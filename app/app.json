@@ -7,6 +7,7 @@
       "version": "1.0.0",
       "sdkVersion": "52.0.0",
       "assetBundlePatterns": ["**/*"],
+      "newArchEnabled": true,
       "ios": {
         "bundleIdentifier": "com.yourappname"
 

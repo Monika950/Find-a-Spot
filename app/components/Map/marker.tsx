@@ -23,7 +23,7 @@ positionMarker, scale }) => {
       console.log("Latitude:", positionMarker.latitude);
       console.log("Longitude:", positionMarker.longitude);
     }}>
-        <Image
+        {/* <Image
           source={require("../../assets/placeholder.png")}
           style={{
             width: markerSize,
@@ -32,7 +32,7 @@ positionMarker, scale }) => {
             justifyContent: "center",
             alignItems: "center",
           }}
-        />
+        /> */}
     </Marker>
   );
 };
