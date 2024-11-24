@@ -12,8 +12,8 @@ enableScreens();
 import CarList from "../components/cars/CarList";
 
 const defaultCenter = {
-  latitude: 42.136097,
-  longitude: 24.742168,
+  latitude: 42.6739544,
+  longitude: 23.3305114,
 };
 
 export default function Index() {
@@ -50,11 +50,6 @@ export default function Index() {
       });
     }
   }, []);
-
-  const lineCoordinates = [
-    defaultCenter,
-    { latitude: 42.6739551, longitude: 23.3305122 },
-  ];
   const [segments, setSegments] = useState([]);
 
   useEffect(() => {

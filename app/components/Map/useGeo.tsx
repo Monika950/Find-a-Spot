@@ -34,6 +34,9 @@ export default function App() {
         }
       );
 
+      const { latitude, longitude } = (await Location.getCurrentPositionAsync()).coords
+      setLocation({coords: { latitude, longitude }})
+
       return () => {
         locationSubscription.remove();
       };
