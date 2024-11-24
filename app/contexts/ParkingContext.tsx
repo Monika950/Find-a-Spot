@@ -13,8 +13,8 @@ interface ParkingDetails {
 
 interface ParkingContextType {
   parkingDetails: ParkingDetails;
-  setParkingDetails: (location: { latitude: number; longitude: number }, plateNumber) => Promise<void>;
-  clearParkingDetails: () => Promise<void>;
+  setParkingDetails: (location: { latitude: number; longitude: number }, plateNumber, userToken) => Promise<void>;
+  clearParkingDetails: (userToken) => Promise<void>;
 }
 
 // Props for the ParkingProvider
@@ -31,7 +31,6 @@ export const ParkingProvider = ({ children }: ParkingProviderProps) => {
     startTime: null,
     plateNumber: null,
   });
-
   // Load parking details from AsyncStorage on app load
   useEffect(() => {
     const loadParkingDetails = async () => {
@@ -49,7 +48,7 @@ export const ParkingProvider = ({ children }: ParkingProviderProps) => {
   }, []);
 
   // Set parking details (location and start time)
-  const setParkingDetails = async (location: { latitude: number; longitude: number }, plateNumber) => {
+  const setParkingDetails = async (location: { latitude: number; longitude: number }, plateNumber, userToken) => {
     try {
       const newDetails: ParkingDetails = {
         location,
@@ -58,15 +57,50 @@ export const ParkingProvider = ({ children }: ParkingProviderProps) => {
       };
       await AsyncStorage.setItem("parkingDetails", JSON.stringify(newDetails));
       setParkingDetailsState(newDetails);
+
+      console.log(userToken);
+
+      if (parkingDetails.startTime) {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_SERVERURL}/cars/park`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`,
+          },
+          body: JSON.stringify({
+            location: location,
+            numberPlate: plateNumber
+          }),
+        });
+
+        console.log(response);
+
+        console.log(await response.json());
+
+      }
+
     } catch (error) {
       console.error("Failed to save parking details to storage:", error);
     }
   };
 
   // Clear parking details
-  const clearParkingDetails = async () => {
+  const clearParkingDetails = async (userToken) => {
     try {
       await AsyncStorage.removeItem("parkingDetails");
+      const response = await fetch(`${process.env.EXPO_PUBLIC_SERVERURL}/cars/park`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({
+          numberPlate: parkingDetails.plateNumber
+        }),
+      });
+
+      console.log(response);
+      console.log(await response.json());
       setParkingDetailsState({ location: null, startTime: null, plateNumber: null });
     } catch (error) {
       console.error("Failed to clear parking details from storage:", error);

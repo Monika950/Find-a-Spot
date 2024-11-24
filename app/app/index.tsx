@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, Modal, Pressable,Image, Alert } from "react-native";
+import { Text, View, StyleSheet, Modal, Pressable, Alert, Button, Image } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
 import { Redirect } from "expo-router";
 import { enableScreens } from "react-native-screens";
@@ -7,6 +7,7 @@ import { Polyline } from "react-native-maps";
 import MarkerPin from "../components/Map/marker";
 import useGeoLocation from "../components/Map/useGeo";
 import MapView from "react-native-maps";
+import { useParking } from "../contexts/ParkingContext";
 
 enableScreens();
 import CarList from "../components/cars/CarList";
@@ -18,7 +19,30 @@ const defaultCenter = {
 
 export default function Index() {
   const { user } = useAuth();
-  const [isPopupVisible, setIsPopupVisible] = useState(false); // Popup visibility state
+  const { parkingDetails, clearParkingDetails } = useParking();
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [timer, setTimer] = useState("");
+
+  useEffect(() => {
+    if (parkingDetails.startTime) {
+      const interval = setInterval(() => {
+        const startTime = new Date(parkingDetails.startTime);
+        const now = new Date();
+        const elapsed = Math.floor((now.getTime() - startTime.getTime()) / 1000); // Time elapsed in seconds
+
+        const hours = Math.floor(elapsed / 3600);
+        const minutes = Math.floor((elapsed % 3600) / 60);
+        const seconds = elapsed % 60;
+
+        setTimer(`${hours}h ${minutes}m ${seconds}s`);
+      }, 1000);
+
+      return () => clearInterval(interval); // Cleanup interval on component unmount
+    } else {
+      setTimer("");
+    }
+  }, [parkingDetails.startTime]);
+
 
   if (!user) {
     return <Redirect href="/auth" />;
@@ -83,6 +107,15 @@ export default function Index() {
     fetchData();
   }, [location]);
 
+  const handleClearParking = async () => {
+    try {
+      await clearParkingDetails(user.token);
+      Alert.alert("Success", "Back on the road!");
+    } catch (error) {
+      Alert.alert("Error", "Failed to clear parking details.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* <Text style={styles.title}>Find a Spot</Text> */}
@@ -129,6 +162,14 @@ export default function Index() {
         })}
       </MapView>
 
+      {timer && (
+        <View style={styles.timerContainer}>
+          <Text style={styles.timerText}>Parked Time: {timer}</Text>
+          <Button title="Close" onPress={handleClearParking} />
+        </View>
+        
+      )}
+
       {/* Circular Popup Button */}
       <Pressable
         style={styles.popupButton}
@@ -146,7 +187,7 @@ export default function Index() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <CarList callback = {setIsPopupVisible} location = {location}/>
+            <CarList callback={setIsPopupVisible} location={location} />
           </View>
         </View>
       </Modal>
@@ -155,55 +196,82 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      margin:0
-    },
-    map: {
-      width: "100%",
-      height: "100%",
-    },
-    logo: {
-      width: 60,
-      height: 90, 
-      position: "absolute",
-      top: 40, 
-      left: 20,
-      zIndex: 10,
-      elevation: 5,
-    },
-    popupButton: {
-      position: "absolute",
-      bottom: 20,
-      right: 20,
-      backgroundColor: "#007bff",
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      justifyContent: "center",
-      alignItems: "center",
-      elevation: 5,
-    },
-    popupButtonText: {
-      color: "white",
-      fontWeight: "bold",
-      fontSize: 24,
-    },
-    modalOverlay: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "rgba(0,0,0,0.5)",
-    },
-    modalContent: {
-      width: "90%",
-      backgroundColor: "white",
-      padding: 20,
-      borderRadius: 10,
-      alignItems: "center",
-      height: 500,
-    },
-  });
-  
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginVertical: 10,
+  },
+  map: {
+    width: "100%",
+    height: "100%",
+  },
+  popupButton: {
+    position: "absolute",
+    bottom: 20, // Positioned above the bottom edge
+    right: 20, // Positioned on the right side of the screen
+    backgroundColor: "#007bff",
+    width: 60, // Circular button
+    height: 60, // Circular button
+    borderRadius: 30, // Make it a perfect circle
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5, // Add shadow for better visibility
+  },
+  popupButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 24, // Large "P"
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    width: "90%",
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    height: 500,
+  },
+  closeButton: {
+    marginTop: 15,
+    padding: 10,
+    backgroundColor: "#6200ee",
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  timerContainer: {
+    position: "absolute",
+    top: 70,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    padding: 10,
+    borderRadius: 10,
+  },
+  timerText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  logo: {
+    width: 60,
+    height: 90, 
+    position: "absolute",
+    top: 40, 
+    left: 20,
+    zIndex: 10,
+    elevation: 5,
+  },
+});
+
+
+

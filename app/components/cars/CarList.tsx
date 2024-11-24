@@ -7,20 +7,30 @@ import {
   StyleSheet,
   Modal,
   Pressable,
+  Alert,
 } from "react-native";
 import CarForm from "./CarForm";
 import SendSMS from "../../hooks/SendSms";
 import { useAuth } from "../../contexts/AuthContext";
+import { useParking } from "../../contexts/ParkingContext";
 import { ZoneNumbers } from "../../constants/ZoneNumbers";
-import { Alert } from "react-native";
 
 export default function CarList({ callback, location }) {
-  const { user } = useAuth();
+  const { user,logout } = useAuth();
+  const { parkingDetails, setParkingDetails } = useParking();
+
   const [cars, setCars] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null); // Track the selected car
   const [isModalVisible, setIsModalVisible] = useState(false); // Track modal visibility
-  const [zoneType, setZoneType] = useState('');
+  const [zoneType, setZoneType] = useState("");
+
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
 
   useEffect(() => {
     async function getCarsData() {
@@ -73,38 +83,38 @@ export default function CarList({ callback, location }) {
 
   const selectCar = (car) => {
     setSelectedCar(car); // Set the selected car
-    setZoneType('Green');
+    setZoneType("Green");
     setIsModalVisible(true); // Show the modal
   };
 
   const handleConfirm = (plateNumber) => {
-
-    const zoneNumber = (zoneType == 'Green' ? ZoneNumbers.greenZoneNumber : ZoneNumbers.blueZoneNumber);
-    SendSMS(plateNumber, zoneNumber, async () => {
+    const zoneNumber = zoneType === "Green" ? ZoneNumbers.greenZoneNumber : ZoneNumbers.blueZoneNumber;
+    SendSMS(plateNumber, "0897878058", async () => {
       try {
         const response = await fetch(`${process.env.EXPO_PUBLIC_SERVERURL}/cars/park`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
           },
           body: JSON.stringify({
             plateNumber,
-            location
+            location,
           }),
         });
 
         const data = await response.json();
+        setIsModalVisible(false);
+        setParkingDetails(location, plateNumber, user.token);
 
       } catch (error) {
-        Alert.alert("Error", "An error occured when trying to send SMS.");
+        Alert.alert("Error", "An error occurred when trying to send SMS.");
       }
-    })
-    
-    setIsModalVisible(false); // Close the modal
+    });
   };
 
   const handleClose = () => {
-    setIsModalVisible(false); // Close the modal
+    setIsModalVisible(false);
   };
 
   return (
@@ -115,18 +125,13 @@ export default function CarList({ callback, location }) {
         data={cars}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.carItem}
-            onPress={() => selectCar(item)}
-          >
+          <TouchableOpacity style={styles.carItem} onPress={() => selectCar(item)}>
             <Text style={styles.carText}>
               {item.name} ({item.number})
             </Text>
           </TouchableOpacity>
         )}
-        ListEmptyComponent={
-          <Text style={styles.noCarsText}>No cars added yet.</Text>
-        }
+        ListEmptyComponent={<Text style={styles.noCarsText}>No cars added yet.</Text>}
       />
 
       <TouchableOpacity style={styles.addButton} onPress={() => setShowForm(true)}>
@@ -137,9 +142,7 @@ export default function CarList({ callback, location }) {
         <Text style={styles.closeButtonText}>Close</Text>
       </TouchableOpacity>
 
-      {showForm && (
-        <CarForm onSubmit={addCar} onCancel={() => setShowForm(false)} />
-      )}
+      {showForm && <CarForm onSubmit={addCar} onCancel={() => setShowForm(false)} />}
 
       {/* Modal for car selection */}
       <Modal
@@ -154,7 +157,10 @@ export default function CarList({ callback, location }) {
               Are you sure you want to send a SMS for {zoneType} zone: {selectedCar?.name} ({selectedCar?.number})?
             </Text>
             <View style={styles.modalButtons}>
-              <Pressable style={styles.modalButtonConfirm} onPress={() => { handleConfirm(selectedCar.number) }}>
+              <Pressable
+                style={styles.modalButtonConfirm}
+                onPress={() => handleConfirm(selectedCar.number)}
+              >
                 <Text style={styles.modalButtonText}>Confirm</Text>
               </Pressable>
               <Pressable style={styles.modalButtonClose} onPress={handleClose}>
@@ -181,11 +187,25 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: "center",
   },
-  noCarsText: {
-    textAlign: "center",
+  timerContainer: {
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  timerText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  stopButton: {
+    marginTop: 10,
+    backgroundColor: "#dc3545",
+    padding: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  stopButtonText: {
+    color: "#fff",
     fontSize: 16,
-    marginVertical: 16,
-    color: "#888",
   },
   carItem: {
     padding: 10,
@@ -267,6 +287,12 @@ const styles = StyleSheet.create({
   },
   modalButtonText: {
     color: "#fff",
+    fontSize: 10,
+  },
+  noCarsText: {
+    textAlign: "center",
     fontSize: 16,
+    marginVertical: 16,
+    color: "#888",
   },
 });
